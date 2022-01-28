@@ -6,7 +6,7 @@
 #include "tinythreads.h"
 
 int pp;
-mutex test;
+mutex mutexlock;
 
 void init_lcd() {
 	// LCD Enable (LCDEN) & Low Power Waveform (LCDAB)
@@ -127,6 +127,7 @@ bool is_prime(long i) {
 }
 
 void printAt(long num, int pos) {
+	// Use the global variable pp to test mutex
     pp = pos;
     writeChar( (num % 100) / 10 + '0', pp);
 	for(volatile int i = 0; i < 1000; i++) {}
@@ -139,21 +140,23 @@ void computePrimes(int pos) {
 
     for(n = 1; ; n++) {
         if (is_prime(n)) {
-	        lock(&test);
+			// Lock the mutex
+	        lock(&mutexlock);
             printAt(n, pos);
             //yield();
-            unlock(&test);
+            unlock(&mutexclock);
         }
     }
 }
 
 ISR(PCINT1_vect) {
-//code for interrupt handler
+	// Check the current value of pin 7 and if active, make a yield
 	if((PINB >> 7) == 0) {
 		yield();
 	}
 }
 
+// Yield when timer interrupts
 ISR(TIMER1_COMPA_vect) {
 	yield();
 }
@@ -163,6 +166,7 @@ int main() {
 	CLKPR  = 0x80;
 	CLKPR  = 0x00;
 
+	// Initialize LCD
 	init_lcd();
 
     spawn(computePrimes, 0);

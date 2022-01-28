@@ -53,7 +53,7 @@ static void initialize(void) {
 	// Set Timer1 Output Compare A
 	TIMSK1 = (1<<OCIE1A);
 	// Set Output Compare Register 1 A to 391 in binary
-	OCR1AL = 0b110000111;
+	OCR1A = 0b110000111;
 	// Start the timer on value 0
 	TCNT1 = 0;
 
@@ -114,13 +114,17 @@ void spawn(void (* function)(int), int arg) {
 }
 
 void yield(void) {
+	// Put the current thread into the readyQ
 	enqueue(current, &readyQ);
+	// Start another thread from readyQ
 	dispatch(dequeue(&readyQ));
 }
 
 void lock(mutex *m) {
+	// If the mutex is not locked, then lock it
 	if(m->locked == 0) {
 		m->locked = 1;
+	// Otherwise enqueue the current thread that wants mutex and start another thread from readyQ
 	} else {
 		enqueue(current, &m->waitQ);
 		dispatch(dequeue(&readyQ));
@@ -128,9 +132,12 @@ void lock(mutex *m) {
 }
 
 void unlock(mutex *m) {
+	// If there is a thread waiting in waitQ in the mutex, enqueue the current thread and start 
+	// the thread in waitQ that is stored in mutex
 	if(m->waitQ) {
 		enqueue(current, &readyQ);
 		dispatch(dequeue(&m->waitQ));
+	// Otherwise unlock the mutex
 	} else {
 		m->locked = 0;
 	}
