@@ -1,6 +1,7 @@
 #include <avr/io.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <avr/interrupt.h>
 
 #include "tinythreads.h"
 
@@ -135,9 +136,14 @@ void computePrimes(int pos) {
     for(n = 1; ; n++) {
         if (is_prime(n)) {
             printAt(n, pos);
-            yield();
+            //yield();
         }
     }
+}
+
+ISR(PCINT1_vect) {
+//code for interrupt handler
+		yield();
 }
 
 int main() {

@@ -35,6 +35,11 @@ static void initialize(void) {
         threads[i].next = &threads[i+1];
     threads[NTHREADS-1].next = NULL;
 
+	PORTB = (1<<PB7);
+	// Pin Change Enable Mask (PCINT15)
+	PCMSK1 = (1<<PCINT15);
+	// External Interrupt Mask Register (EIMSK)
+	EIMSK = (1<<PCIE1);
 
     initialized = 1;
 }
