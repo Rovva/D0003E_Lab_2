@@ -119,9 +119,19 @@ void yield(void) {
 }
 
 void lock(mutex *m) {
-
+	if(m->locked == 0) {
+		m->locked = 1;
+	} else {
+		enqueue(current, &m->waitQ);
+		dispatch(dequeue(&readyQ));
+	}
 }
 
 void unlock(mutex *m) {
-
+	if(m->waitQ) {
+		enqueue(current, &readyQ);
+		dispatch(dequeue(&m->waitQ));
+	} else {
+		m->locked = 0;
+	}
 }
