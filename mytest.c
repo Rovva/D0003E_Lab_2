@@ -144,7 +144,7 @@ void computePrimes(int pos) {
 	        lock(&mutexlock);
             printAt(n, pos);
             //yield();
-            unlock(&mutexclock);
+            unlock(&mutexlock);
         }
     }
 }
