@@ -135,6 +135,7 @@ void computePrimes(int pos) {
     for(n = 1; ; n++) {
         if (is_prime(n)) {
             printAt(n, pos);
+            yield();
         }
     }
 }
@@ -143,6 +144,8 @@ int main() {
 	// Setup the clockspeed
 	CLKPR  = 0x80;
 	CLKPR  = 0x00;
+
+	init_lcd();
 
     spawn(computePrimes, 0);
     computePrimes(3);
