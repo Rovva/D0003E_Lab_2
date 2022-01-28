@@ -40,6 +40,22 @@ static void initialize(void) {
 	PCMSK1 = (1<<PCINT15);
 	// External Interrupt Mask Register (EIMSK)
 	EIMSK = (1<<PCIE1);
+	// Timer 1 with 1024 prescaler with CTC (WGM13, WGM12)
+	TCCR1B = (0<<WGM13) | (1<<WGM12) | (1<<CS12) | (0<<CS11) | (1<<CS10);
+
+	/* 8 Mhz = 8 000 000
+	 * 8 000 000 / 1024 = 7812,5
+	 * 7812,5 = 1 second
+	 * 7812,5 / 1000 * 50 = 390,625
+	 * 391 = 50 ms
+	 * 391 = 0b110000111
+	 */
+	// Set Timer1 Output Compare A
+	TIMSK1 = (1<<OCIE1A);
+	// Set Output Compare Register 1 A to 391 in binary
+	OCR1AL = 0b110000111;
+	// Start the timer on value 0
+	TCNT1 = 0;
 
     initialized = 1;
 }

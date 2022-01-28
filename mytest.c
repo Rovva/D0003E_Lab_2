@@ -143,7 +143,11 @@ void computePrimes(int pos) {
 
 ISR(PCINT1_vect) {
 //code for interrupt handler
-		yield();
+	yield();
+}
+
+ISR(TIMER1_COMPA_vect) {
+	yield();
 }
 
 int main() {
