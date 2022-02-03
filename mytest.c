@@ -6,7 +6,7 @@
 #include "tinythreads.h"
 
 int pp;
-mutex mutexlock;
+mutex mutexlock = {0,0};
 
 void init_lcd() {
 	// LCD Enable (LCDEN) & Low Power Waveform (LCDAB)
@@ -127,12 +127,14 @@ bool is_prime(long i) {
 }
 
 void printAt(long num, int pos) {
+	lock(&mutexlock);
 	// Use the global variable pp to test mutex
     pp = pos;
     writeChar( (num % 100) / 10 + '0', pp);
-	for(volatile int i = 0; i < 1000; i++) {}
+    for(volatile int i = 0; i < 30000; i++) {}
     pp++;
     writeChar( num % 10 + '0', pp);
+    unlock(&mutexlock);
 }
 
 void computePrimes(int pos) {
@@ -141,10 +143,8 @@ void computePrimes(int pos) {
     for(n = 1; ; n++) {
         if (is_prime(n)) {
 			// Lock the mutex
-	        lock(&mutexlock);
             printAt(n, pos);
             //yield();
-            unlock(&mutexlock);
         }
     }
 }
